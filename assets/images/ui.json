@@ -1,0 +1,187 @@
+{
+	"textures": [
+		{
+			"image": "ui",
+			"format": "RGBA8888",
+			"size": {
+				"w": 1774,
+				"h": 1730
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "warning",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1594,
+						"h": 682
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1594,
+						"h": 682
+					},
+					"frame": {
+						"x": 2,
+						"y": 2,
+						"w": 1594,
+						"h": 682
+					}
+				},
+				{
+					"filename": "winBG",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1036,
+						"h": 647
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1036,
+						"h": 647
+					},
+					"frame": {
+						"x": 2,
+						"y": 688,
+						"w": 1036,
+						"h": 647
+					}
+				},
+				{
+					"filename": "p1win",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 883,
+						"h": 389
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 883,
+						"h": 389
+					},
+					"frame": {
+						"x": 2,
+						"y": 1339,
+						"w": 883,
+						"h": 389
+					}
+				},
+				{
+					"filename": "p2win",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 883,
+						"h": 389
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 883,
+						"h": 389
+					},
+					"frame": {
+						"x": 889,
+						"y": 1339,
+						"w": 883,
+						"h": 389
+					}
+				},
+				{
+					"filename": "solution",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 518,
+						"h": 323
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 518,
+						"h": 323
+					},
+					"frame": {
+						"x": 1042,
+						"y": 688,
+						"w": 518,
+						"h": 323
+					}
+				},
+				{
+					"filename": "draw",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 571,
+						"h": 154
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 571,
+						"h": 154
+					},
+					"frame": {
+						"x": 1042,
+						"y": 1015,
+						"w": 571,
+						"h": 154
+					}
+				},
+				{
+					"filename": "newGame",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 260,
+						"h": 103
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 260,
+						"h": 103
+					},
+					"frame": {
+						"x": 1042,
+						"y": 1173,
+						"w": 260,
+						"h": 103
+					}
+				},
+				{
+					"filename": "okButton",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 260,
+						"h": 103
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 260,
+						"h": 103
+					},
+					"frame": {
+						"x": 1306,
+						"y": 1173,
+						"w": 260,
+						"h": 103
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "http://free-tex-packer.com",
+		"version": "0.6.7"
+	}
+}
