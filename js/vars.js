@@ -1,7 +1,7 @@
 var vars = {
     DEBUG: true,
 
-    version: 0.96,
+    version: 0.962,
 
     getScene: ()=> {
         return vars.Phaser.scene;
@@ -134,6 +134,8 @@ var vars = {
             let lS = vars.loadingScreen;
 
             vars.input.enabled = false;
+
+            vars.UI.destroyBouncingBalls();
 
             scene.tweens.add({
                 targets: [sS,lS], alpha: 0, duration: 750
@@ -299,7 +301,8 @@ var vars = {
     },
 
     UI: {
-        containers: { manual: null, selectionScreen: null },
+        containers: { bouncingBalls: null, manual: null, selectionScreen: null },
+        marbleColours: ['White','Yellow','Orange','Red','Blue','Green'],
 
         init: ()=> {
             let UI = vars.UI;
@@ -327,7 +330,15 @@ var vars = {
             scene.tweens.add({ targets: lS, alpha: 1, duration: 750, ease: 'Quad.easeOut' });
         },
 
-        generateManual(scene, cC) {
+        destroyBouncingBalls: ()=> {
+            let kids = vars.UI.containers.bouncingBalls.getAll();
+            kids.forEach((_k)=> {
+                _k.tween && _k.tween.remove();
+                _k.destroy();
+            });
+        },
+
+        generateManual: (scene, cC)=> {
             let containers = vars.UI.containers;
             let c = containers.manual = scene.add.container().setDepth(consts.depths.manual).setAlpha(0);
 
@@ -350,7 +361,7 @@ var vars = {
             }
         },
 
-        generateSelectionScreen(scene, cC) {
+        generateSelectionScreen: (scene, cC)=> {
             let containers = vars.UI.containers;
             let c = containers.selectionScreen = scene.add.container().setDepth(consts.depths.selectionScreen).setAlpha(0);
 
@@ -376,8 +387,57 @@ var vars = {
                 let alpha = _show ? 1 : 0;
                 scene.tweens.add({
                     targets: c, alpha: alpha, duration: 1000,
-                    onComplete: ()=> { vars.input.enabled=true; }
+                    onComplete: ()=> { vars.input.enabled=true; vars.UI.startBouncingBalls(); }
                 });
+            };
+        },
+
+        newBouncingMarble: (delay)=> {
+            if (vars.UI.containers.selectionScreen.alpha!==1) return;
+
+            let UI = vars.UI;
+            let c = UI.containers;
+            let scene = vars.getScene();
+
+
+            let container = c.bouncingBalls;
+
+            // get random marble
+            let colours = UI.marbleColours;
+            let marbleColour = getRandom(colours);
+
+            // get random position
+            let p = getRandom(consts.marblesBounceAreas);
+            let x = getRandom(p.xMin, p.xMax);
+            let y = getRandom(p.yMin, p.yMax);
+
+            let marble = scene.add.image(x,y,'boardAndPieces',`marble${marbleColour}`).setScale(4).setAlpha(0);
+            container.add(marble);
+
+            marble.tween = scene.tweens.add({
+                targets: marble, scale: 1, delay: delay, duration: 2500, ease: 'Bounce.easeOut',
+                onStart: ()=> {
+                    marble && marble.setAlpha(1);
+                },
+                onComplete: ()=> {
+                    marble.tween = scene.tweens.add({
+                        targets: marble, alpha: 0, delay: 1000, duration: 500,
+                        onComplete: ()=> {
+                            marble && marble.destroy();
+                        }
+                    });
+                    UI.newBouncingMarble(0);
+                }
+            });
+        },
+
+        startBouncingBalls() {
+            vars.UI.containers.bouncingBalls = vars.getScene().add.container().setDepth(consts.depths.selectionScreen);
+            
+            let dDelta = 1000;
+            for (let m=0; m<3; m++) {
+                let delay = dDelta*m;
+                vars.UI.newBouncingMarble(delay);
             };
         }
     }

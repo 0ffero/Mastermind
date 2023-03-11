@@ -178,7 +178,6 @@ let Board = class {
         if (this.currentPlayer===1) { // both players have set the solutions
             this.solutions = { 1: this.solutions[2], 2: this.solutions[1] }; // swap the solutions around
             this.nextState(); // update the state to playing
-            this.moveButtonContainer();
         };
 
         return sol.length-1;
@@ -220,7 +219,6 @@ let Board = class {
                     this.setWinRequired();
                     console.log(`PLAYER 1 FOUND THEIR SOLUTION\n    Player 2 MUST find the solution this attempt!`);
                     this.nextPlayer();
-                    this.moveButtonContainer();
                     return;
                 };
 
@@ -270,7 +268,6 @@ let Board = class {
         
         // after checking the guess, get the next player
         this.nextPlayer();
-        this.moveButtonContainer();
     }
 
     clearGuess() {
@@ -438,6 +435,8 @@ let Board = class {
         if (!b) return false;
 
         b.forEach((_b)=> { _b.setVisible(_show); });
+
+        _show && this.moveButtonContainer();
 
         return true;
     }

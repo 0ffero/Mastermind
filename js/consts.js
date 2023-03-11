@@ -17,6 +17,11 @@ const consts = {
         manual:             110
     },
 
+    marblesBounceAreas: [
+        { xMin: 110, xMax: 110+520, yMin: 480, yMax: 480+500 },
+        { xMin: 1290, xMax: 1290+520, yMin: 90, yMax: 90+720 }
+    ],
+
     mouse: {
         buttons: {
             LEFT        : 0,

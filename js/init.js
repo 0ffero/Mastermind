@@ -52,6 +52,4 @@ function create() {
 };
 
 
-function update() {
-
-};
+function update() { };
