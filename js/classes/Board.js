@@ -5,6 +5,8 @@ let Board = class {
         this.cC = consts.canvas;
         this.currentPlayer = null; // initialised in initPlayers
 
+        this.singlePlayer = vars.App.singlePlayer;
+
         this.init();
     }
 
@@ -26,17 +28,9 @@ let Board = class {
 
         this.table = scene.add.image(cC.cX+15, cC.cY, texture,'board');
 
-        let c = this.containers;
-        let bC = c.buttons = scene.add.container();
-        bC.setDepth(consts.depths.buttons);
-        bC.y = 505;
-        this.buttons = { check: null, clear: null };
-        ['clear','check'].forEach((_bName, _i)=> {
-            let button = scene.add.image(0, 190*_i, texture, `button${_bName.capitalise()}`).setName(`button_${_bName}`).setOrigin(0).setInteractive();
-            this.buttons[_bName] = button;
-            bC.add(button);
-        });
-        this.showButtons(false, 'ALL');
+        this.initSolutions();
+
+        this.initButtons(scene, texture);
 
         // generate the win container
         this.initWinScreen(scene,cC);
@@ -44,20 +38,72 @@ let Board = class {
         // same for the warning screen
         this.initWarningScreen(scene, cC);
 
-        this.initPlayers();
+        if (this.singlePlayer) {
+            this.initSinglePlayerPopup(scene,cC);
+            let delay = this.singlePlayerHideBoard2();
+            scene.tweens.addCounter({
+                from: 0, to: 1, duration: delay,
+                onComplete: ()=> {
+                    this.initPlayers();
+                    this.generateRandomSolution();
+                }
+            });
+        } else {
+            this.initPlayers();
+        };
 
-        this.initSolutions();
+    }
 
+    initButtons(scene, texture) {
+        let c = this.containers;
+        let bC = c.buttons = scene.add.container();
+        bC.setDepth(consts.depths.buttons);
+        bC.y = 505;
+
+        this.buttons = { check: null, clear: null };
+        ['clear','check'].forEach((_bName, _i)=> {
+            let button = scene.add.image(0, 190*_i, texture, `button${_bName.capitalise()}`).setName(`button_${_bName}`).setOrigin(0).setInteractive();
+            this.buttons[_bName] = button;
+            bC.add(button);
+        });
+        this.showButtons(false, 'ALL');
     }
 
     initPlayers() {
         this.players = { 1: null, 2: null };
-        [1,2].forEach((_pID)=> {
+
+        let pS = !this.singlePlayer ? [1,2] : [1]; // the default
+        pS.forEach((_pID)=> {
             this.players[_pID] = new Player(_pID);
         });
 
         this.winRequired = false;
         this.currentPlayer = 1;
+    }
+
+    initSinglePlayerPopup(scene, cC) {
+        let sPP = this.containers.singlePlayerPopup = scene.add.container();
+        sPP.setDepth(consts.depths.singlePlayerPopup).setAlpha(0);
+
+        let blackbg = scene.add.image(cC.cX, cC.cY, 'pixelwhite').setTint(consts.canvas.colour).setScale(cC.width, cC.height).setAlpha(0.5).setInteractive();
+        sPP.add(blackbg);
+
+        let warning = scene.add.image(cC.cX, cC.height*0.5, 'ui', 'generatingCode');
+        sPP.add(warning);
+        sPP.x-=cC.cX/2;
+
+        sPP.show = ()=> {
+            scene.tweens.add({
+                targets: sPP, alpha: 1, duration: 500, hold: 1500, yoyo: true,
+                onComplete: ()=> {
+                    // start the game (allow interaction etc)
+                    this.nextState();
+                    // show the first position
+                    this.players[1].showNextSet();
+                    vars.input.enabled = true;
+                }
+            });
+        };
     }
 
     initSolutions() {
@@ -68,7 +114,7 @@ let Board = class {
         let wC = this.containers.warning = scene.add.container();
         wC.setDepth(consts.depths.warningContainer).setAlpha(0);
 
-        let blackbg = scene.add.image(cC.cX, cC.cY, 'pixelblack').setScale(cC.width, cC.height).setAlpha(0.7);
+        let blackbg = scene.add.image(cC.cX, cC.cY, 'pixelblack').setScale(cC.width, cC.height).setAlpha(0.7).setInteractive();
         wC.add(blackbg);
 
         let warning = scene.add.image(cC.cX, cC.height*0.5, 'ui', 'warning');
@@ -98,7 +144,7 @@ let Board = class {
         let wC = this.containers.win = scene.add.container();
         wC.setDepth(consts.depths.winContainer).setAlpha(0);
 
-        let blackbg = scene.add.image(cC.cX, cC.cY, 'pixelblack').setScale(cC.width, cC.height).setAlpha(0.7);
+        let blackbg = scene.add.image(cC.cX, cC.cY, 'pixelblack').setScale(cC.width, cC.height).setAlpha(0.7).setInteractive();
         wC.add(blackbg);
 
         let bg = scene.add.image(cC.cX, cC.height*0.4, 'ui', 'winBG');
@@ -113,6 +159,9 @@ let Board = class {
 
         let newGameButton = this.newGameButton = scene.add.image(cC.cX, cC.height*0.8, 'ui', 'newGame').setName('button_newGame').setAlpha(0).setInteractive();
         wC.add(newGameButton);
+
+
+        this.singlePlayer && (wC.x-=cC.cX/2);
     }
 
     addToSolution(_int) {
@@ -166,22 +215,29 @@ let Board = class {
         
         if (inPlace===4) { // this player has found a solution
             p.winMessage.show(); // show the win message
-            let winImage;
             if (pID===1) { // if this is player one, player two still has a shot, but they must crack the combination on their next attempt
-                this.setWinRequired();
-                console.log(`PLAYER 1 FOUND THEIR SOLUTION\n    Player 2 MUST find the solution this attempt!`);
-                this.nextPlayer();
-                this.moveButtonContainer();
-                return;
-            } else { // player 2 has found the combination!
-                if (this.winRequired) { // draw! both player 1 and 2 completed on the same move
-                    console.log(`GAME HAS ENDED IN A DRAW!`);
-                    winImage = 3;
-                } else { // player 2 wins!
-                    winImage = 2;
+                if (!this.singlePlayer) {
+                    this.setWinRequired();
+                    console.log(`PLAYER 1 FOUND THEIR SOLUTION\n    Player 2 MUST find the solution this attempt!`);
+                    this.nextPlayer();
+                    this.moveButtonContainer();
+                    return;
                 };
+
+                // show win message
+                this.updateWinScreen(1);
+                this.showWinScreen();
+                return;
             };
             
+            // player 2 has found the combination!
+            let winImage;
+            if (this.winRequired) { // draw! both player 1 and 2 completed on the same move
+                console.log(`GAME HAS ENDED IN A DRAW!`);
+                winImage = 3;
+            } else { // player 2 wins!
+                winImage = 2;
+            };
 
             this.updateWinScreen(winImage);
             this.showWinScreen();
@@ -235,12 +291,12 @@ let Board = class {
     destroyPlayers() {
         // back up the player scores
         this.scores = [];
-        [1,2].forEach((_p)=> {
-            this.scores.push(this.players[_p].score);
+        let players = !this.singlePlayer ? [1,2] : [1];
+        players.forEach((_p)=> {
+            this.scores.push(this.players[_p].wins);
             this.players[_p].destroy(); // destroy the player
+            this.players[_p]=null;
         });
-
-        this.players = { 1: null, 2: null };
     }
 
     // after checking the solution, this places the pegs on the solution section of the board
@@ -297,6 +353,20 @@ let Board = class {
         this.showButtons(false, 'ALL');
     }
 
+    generateRandomSolution() {
+        // show pop up saying we're generating the random solution
+        this.containers.singlePlayerPopup.show();
+        
+        // generate random solution
+        let sol = [];
+        for (let i=0; i<4; i++) {
+            sol.push(getRandom(0,5));
+        };
+
+        vars.DEBUG && console.log('Solution:',sol);
+        this.solutions[1] = sol;
+    }
+
     hideWinScreen() {
         let duration = 1000;
         let wS = this.containers.win;
@@ -336,6 +406,8 @@ let Board = class {
     }
 
     nextPlayer() {
+        if (this.singlePlayer) return;
+
         this.currentPlayer = this.currentPlayer===1 ? 2: 1;
 
         vars.DEBUG && console.log(`Player ${this.currentPlayer} shot`);
@@ -391,6 +463,30 @@ let Board = class {
                 });
             }
         });
+    }
+
+    singlePlayerHideBoard2() {
+        let scene = this.scene;
+        let cC = this.cC;
+
+        let leftCoverImage = this.leftCoverImage = scene.add.image(cC.width*0.75+15,cC.cY,'pixelwhite').setScale(cC.width/2, cC.height).setTint(cC.colour).setAlpha(0);
+
+        let cam = vars.camera.mainCam
+        let destX = -0.25*cC.width;
+
+        let coverTime = 666;
+        let camScrollDuration = 1500;
+
+        scene.tweens.add({
+            targets: leftCoverImage, alpha: 1, duration: coverTime,
+            onComplete: ()=> {
+                scene.tweens.add({
+                    targets: cam, scrollX: destX, duration: camScrollDuration, ease: 'Quad.easeOut'
+                });
+            }
+        });
+
+        return coverTime + camScrollDuration;
     }
 
     updateWinScreen(_pID) { // pID = 1 or 2

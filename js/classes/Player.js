@@ -4,20 +4,25 @@ let Player = class {
         if (_id!==1 && _id!==2) return `Invalid player id: ${_id}`;
         
         let scene = vars.getScene();
+        let cC = consts.canvas;
         this.id = _id;
-        this.wins = 0;
-        this.groups = {
-            setters: scene.add.group(),
-        };
 
-        this.padding = {
-            left: 45,
-            p1: 30, p2: 965,
-            top: 150,
-            spacing: 15
-        };
+        this.wins = 0;
+
+        this.groups = { setters: scene.add.group() };
+
+        this.padding = { left: 45, p1: 30, p2: 965, top: 150, spacing: 15 };
 
         this.initPositions();
+        this.initChooser();
+
+        if (!vars.App.singlePlayer) { // the setter is only needed for 2 player games
+            this.initSetter(scene,cC);
+        };
+        this.initMarbles(scene);
+        this.initNameplate(scene, cC);
+        this.initWinCount(scene,cC);
+        this.initWinMessage(scene,cC);
     }
 
     initPositions() {
@@ -32,7 +37,7 @@ let Player = class {
         let y = pads.top;
 
         let w = 0;
-        let delay = 0; let delayDelta = 100;
+        let delay = 1000; let delayDelta = 100;
         this.guessArray = [];
         this.guessContainers = [];
         this.pinContainers = [];
@@ -49,7 +54,6 @@ let Player = class {
         };
 
         this.startDelay = delay;
-        this.initChooser();
     }
 
     initChooser() {
@@ -61,12 +65,6 @@ let Player = class {
         let y = cC.height * 0.8;
 
         this.chooser = scene.add.image(x, y, 'boardAndPieces', 'chooser');
-
-        this.initSetter(scene,cC);
-        this.initMarbles(scene);
-        this.initNameplate(scene, cC);
-        this.initWinCount(scene,cC);
-        this.initWinMessage(scene,cC);
     }
 
     initMarbles(scene) {
@@ -102,11 +100,14 @@ let Player = class {
         pID===1 && (vars.input.enabled = false);
 
         let setter = this.setter = scene.add.image(x, y, 'boardAndPieces', 'setter').setAlpha(0);
-        this.groups.setters.add(setter); // I dont think I need this anymore
+        this.groups.setters.add(setter);
 
         let endY = cC.cY;
         setter.tween = scene.tweens.add({
-            targets: setter, alpha: 1, duration: 1000, delay: this.startDelay*1.75, y: endY, ease: 'Quad.easeOut',
+            targets: setter, alpha: 1, duration: 500, delay: this.startDelay*1.5, y: endY, ease: 'Quad.easeOut',
+            onStart: ()=> {
+                pID===1 && vars.audio.playSound('woodSlide');
+            },
             onComplete: ()=> {
                 if (pID===1) return;
                 vars.input.enabled = true;
@@ -218,7 +219,10 @@ let Player = class {
         // destroy individual bits and pieces
         this.chooser.destroy();         delete(this.chooser);
         this.nameplate.destroy();       delete(this.nameplate);
-        this.setter.destroy();          delete(this.setter);
+        if (this.setter) {
+            this.setter.destroy();
+            delete(this.setter);
+        };
         this.winCountText.destroy();    delete(this.winCountText);
         this.winMessage.destroy();      delete(this.winMessage);
 

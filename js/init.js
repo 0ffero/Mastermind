@@ -8,7 +8,7 @@ var config = {
     fps: { target: 60 },
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH, width: consts.canvas.width, height: consts.canvas.height },
     scene: { preload: preload, create: create, update: update,
-        pack: { files: [ { type: 'image', key: 'loadingScreen', url: 'loadingScreen.png'} ] }
+        pack: { files: [ { type: 'atlas', key: 'loadingScreen', url: 'loadingScreen.png'} ] }
     }
 };
 
@@ -24,12 +24,8 @@ var game = vars.Phaser.game = new Phaser.Game(config);
 */
 function preload() {
     vars.Phaser.scene = this;
-    let scene = vars.getScene();
-    let cC = consts.canvas;
-    let lS = vars.loadingScreen = scene.add.image(cC.cX,cC.cY,'loadingScreen').setAlpha(0).setDepth(consts.depths.loadingScreen);
-    scene.tweens.add({
-        targets: lS, alpha: 1, duration: 1000
-    });
+    vars.UI.initLoadingScreen();
+
     vars.init();
 }
 
@@ -45,13 +41,13 @@ function preload() {
 function create() {
     let scene = vars.getScene();
     let lS = vars.loadingScreen;
+    let lsImage = lS.getByName('lsImage');
+    let logo = lS.getByName('logo');
+    vars.App.init();
+
     scene.tweens.add({
-        targets: lS, alpha: 0, delay: 3000, duration: 1000,
-        onComplete: ()=> {
-            lS.destroy();
-            delete(vars.loadingScreen);
-            vars.App.init();
-        }
+        targets: [lsImage,logo], scale: 0.7, delay: 2000, duration: 750, ease: 'Quad.easeOut',
+        onComplete: vars.UI.containers.selectionScreen.show
     });
 };
 

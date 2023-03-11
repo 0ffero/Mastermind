@@ -4,11 +4,32 @@
 			"image": "ui",
 			"format": "RGBA8888",
 			"size": {
-				"w": 1774,
-				"h": 1730
+				"w": 2638,
+				"h": 2007
 			},
 			"scale": 1,
 			"frames": [
+				{
+					"filename": "manual",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1597,
+						"h": 990
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1597,
+						"h": 990
+					},
+					"frame": {
+						"x": 2,
+						"y": 2,
+						"w": 1597,
+						"h": 990
+					}
+				},
 				{
 					"filename": "warning",
 					"rotated": false,
@@ -25,7 +46,7 @@
 					},
 					"frame": {
 						"x": 2,
-						"y": 2,
+						"y": 996,
 						"w": 1594,
 						"h": 682
 					}
@@ -45,8 +66,8 @@
 						"h": 647
 					},
 					"frame": {
-						"x": 2,
-						"y": 688,
+						"x": 1600,
+						"y": 996,
 						"w": 1036,
 						"h": 647
 					}
@@ -66,8 +87,8 @@
 						"h": 389
 					},
 					"frame": {
-						"x": 2,
-						"y": 1339,
+						"x": 1603,
+						"y": 2,
 						"w": 883,
 						"h": 389
 					}
@@ -87,10 +108,31 @@
 						"h": 389
 					},
 					"frame": {
-						"x": 889,
-						"y": 1339,
+						"x": 1603,
+						"y": 395,
 						"w": 883,
 						"h": 389
+					}
+				},
+				{
+					"filename": "generatingCode",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 668,
+						"h": 323
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 668,
+						"h": 323
+					},
+					"frame": {
+						"x": 1600,
+						"y": 1647,
+						"w": 668,
+						"h": 323
 					}
 				},
 				{
@@ -108,8 +150,8 @@
 						"h": 323
 					},
 					"frame": {
-						"x": 1042,
-						"y": 688,
+						"x": 2,
+						"y": 1682,
 						"w": 518,
 						"h": 323
 					}
@@ -129,30 +171,72 @@
 						"h": 154
 					},
 					"frame": {
-						"x": 1042,
-						"y": 1015,
+						"x": 1603,
+						"y": 788,
 						"w": 571,
 						"h": 154
 					}
 				},
 				{
-					"filename": "newGame",
+					"filename": "singlePlayerButton",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
-						"w": 260,
+						"w": 445,
 						"h": 103
 					},
 					"spriteSourceSize": {
 						"x": 0,
 						"y": 0,
-						"w": 260,
+						"w": 445,
 						"h": 103
 					},
 					"frame": {
-						"x": 1042,
-						"y": 1173,
-						"w": 260,
+						"x": 2178,
+						"y": 788,
+						"w": 445,
+						"h": 103
+					}
+				},
+				{
+					"filename": "twoPlayerButton",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 445,
+						"h": 103
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 445,
+						"h": 103
+					},
+					"frame": {
+						"x": 524,
+						"y": 1682,
+						"w": 445,
+						"h": 103
+					}
+				},
+				{
+					"filename": "manualButton",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 445,
+						"h": 103
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 445,
+						"h": 103
+					},
+					"frame": {
+						"x": 973,
+						"y": 1682,
+						"w": 445,
 						"h": 103
 					}
 				},
@@ -171,8 +255,29 @@
 						"h": 103
 					},
 					"frame": {
-						"x": 1306,
-						"y": 1173,
+						"x": 2272,
+						"y": 1647,
+						"w": 260,
+						"h": 103
+					}
+				},
+				{
+					"filename": "newGame",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 260,
+						"h": 103
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 260,
+						"h": 103
+					},
+					"frame": {
+						"x": 2272,
+						"y": 1754,
 						"w": 260,
 						"h": 103
 					}

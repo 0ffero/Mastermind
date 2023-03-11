@@ -1,7 +1,7 @@
 var vars = {
     DEBUG: true,
 
-    version: 0.91,
+    version: 0.96,
 
     getScene: ()=> {
         return vars.Phaser.scene;
@@ -19,10 +19,10 @@ var vars = {
 
     files: {
         audio: {
-            load: ()=> {
-                /*
-				scene.load.audio('pieceDrop', 'audio/pieceDrop.ogg');
-				*/
+            load: (scene)=> {
+                ['buttonClick','woodSlide'].forEach((_a)=> {
+                    scene.load.audio(_a, `audio/${_a}.ogg`);
+                });
             }
         },
 
@@ -36,7 +36,8 @@ var vars = {
             postE: 'IAAACQd1Pe',
             base64s: {
                 'pixelblack': '[a][e][d]R4AWMAAgAABAABsYaQRA[c]',
-                'pixelwhite': '[a][b]P4DwABAQEANl9ngA[c]'
+                'pixelwhite': '[a][b]P4DwABAQEANl9ngA[c]',
+                'pixelbg': '[a][e]AAAADElEQVR42mNgMHAAAACkAHFzb6itAAAAAElFTkSuQmCC'
             },
 
             init: (_scene)=> {
@@ -77,11 +78,9 @@ var vars = {
             scene.load.setPath('assets');
 
             let fV = vars.files;
+			fV.audio.load(scene);
             fV.images.init(scene);
             fV.plugins.load(scene);
-            /*
-			fV.audio.load();
-			*/
         }
     },
 
@@ -100,6 +99,7 @@ var vars = {
     // APP
     App: {
         Board: null,
+        singlePlayer: false,
         getCurrentPlayer: (_returnClass=true)=> {
             if (!_returnClass) return vars.App.Board.currentPlayer;
             return vars.App.Board.players[vars.App.Board.currentPlayer];
@@ -108,14 +108,36 @@ var vars = {
             return vars.App.Board.players[_id];
         },
         init: ()=> {
+            vars.camera.init();
             // generate the UI
             vars.UI.init();
-            // generate the table etc
-            vars.App.initTable();
         },
 
         initTable: ()=> {
             vars.App.Board = new Board();
+        },
+
+        // if single player, this generates the random solution for player 1
+        CPUGenerateRandomSolution: ()=> {
+            let b = vars.App.Board;
+            b.generateRandomSolution();
+        },
+
+        generateTable: ()=> {
+            // generate the table etc
+            vars.App.initTable();
+        },
+
+        hideSelectionScreen: ()=> {
+            let scene = vars.getScene();
+            let sS = vars.UI.containers.selectionScreen;
+            let lS = vars.loadingScreen;
+
+            vars.input.enabled = false;
+
+            scene.tweens.add({
+                targets: [sS,lS], alpha: 0, duration: 750
+            });
         },
 
         start: ()=> {
@@ -125,7 +147,9 @@ var vars = {
             b.initSolutions();
             b.initPlayers();
             b.setWins(); // push the wins back into the players
-            b.nextState()
+            b.nextState();
+
+            b.singlePlayer && vars.App.CPUGenerateRandomSolution();
         }
     },
 
@@ -141,7 +165,7 @@ var vars = {
         },
 
         playSound: function(_key) {
-            scene.sound.play(_key);
+            vars.getScene().sound.play(_key);
         },
     },
 
@@ -149,7 +173,7 @@ var vars = {
         mainCam: null,
 
         init: ()=> {
-            vars.camera.mainCam = scene.cameras.main;
+            vars.camera.mainCam = vars.getScene().cameras.main;
         },
 
         shake: ()=> {
@@ -190,6 +214,22 @@ var vars = {
                 if (name.startsWith('button_')) {
                     let button = name.replace('button_','');
                     switch (button) {
+                        case 'singlePlayer':
+                            vars.App.singlePlayer=true;
+                            vars.App.hideSelectionScreen();
+                            vars.App.generateTable();
+                        break;
+
+                        case 'twoPlayer':
+                            vars.App.singlePlayer=false;
+                            vars.App.hideSelectionScreen();
+                            vars.App.generateTable();
+                        break;
+
+                        case 'manual':
+                            vars.UI.containers.manual.show();
+                        break;
+
                         case 'check':
                             board.checkGuess();
                         break;
@@ -205,7 +245,10 @@ var vars = {
                         case 'newGame':
                             board.restart();
                         break;
+
+                        default: return; break;
                     };
+                    vars.audio.playSound('buttonClick')
                     return;
                 };
             })
@@ -256,8 +299,86 @@ var vars = {
     },
 
     UI: {
-        init: function() {
+        containers: { manual: null, selectionScreen: null },
+
+        init: ()=> {
+            let UI = vars.UI;
+            let scene = vars.getScene();
+            let cC = consts.canvas;
+            UI.generateSelectionScreen(scene, cC);
+            UI.generateManual(scene, cC);
+        },
+
+        initLoadingScreen: ()=> {
+            let scene = vars.getScene();
+            let cC = consts.canvas;
+            let depth = consts.depths.loadingScreen;
+
+            let lS = vars.loadingScreen = scene.add.container().setAlpha(0).setDepth(depth);
             
+            let lsImage = scene.add.image(cC.width*0.025,cC.height*0.05,'loadingScreen','mastermindLogo').setOrigin(0).setName('lsImage');
+            lS.add(lsImage);
+
+            let offer0 = scene.add.image(cC.width*0.975,cC.height*0.975,'loadingScreen','offer0').setOrigin(1).setName('logo');
+            lS.add(offer0);
+
+            scene.add.text(cC.cX, cC.height-5, `Version: ${vars.version}`, vars.fonts.small).setOrigin(0.5,1).setDepth(depth);
+
+            scene.tweens.add({ targets: lS, alpha: 1, duration: 750, ease: 'Quad.easeOut' });
+        },
+
+        generateManual(scene, cC) {
+            let containers = vars.UI.containers;
+            let c = containers.manual = scene.add.container().setDepth(consts.depths.manual).setAlpha(0);
+
+            let bg = scene.add.image(cC.cX, cC.cY, 'pixelblack').setScale(cC.width, cC.height).setAlpha(0.33).setInteractive();
+            bg.on('pointerdown', ()=> {
+                c.show(false);
+            });
+            c.add(bg);
+
+            let manual = scene.add.image(cC.cX, cC.cY, 'ui', 'manual');
+            c.add(manual);
+
+            c.show = (_show=true)=> {
+                vars.input.enabled=false;
+                let alpha = _show ? 1 : 0;
+                scene.tweens.add({
+                    targets: c, alpha: alpha, duration: 500,
+                    onComplete: ()=> { vars.input.enabled=true; }
+                });
+            }
+        },
+
+        generateSelectionScreen(scene, cC) {
+            let containers = vars.UI.containers;
+            let c = containers.selectionScreen = scene.add.container().setDepth(consts.depths.selectionScreen).setAlpha(0);
+
+            // single player button
+            let y = cC.height * 0.4;
+            let sPB = scene.add.image(cC.cX, y, 'ui', 'singlePlayerButton').setName('button_singlePlayer').setInteractive();
+            c.add(sPB);
+
+            // two player button
+            y = cC.height * 0.5;
+            let tPB = scene.add.image(cC.cX, y, 'ui', 'twoPlayerButton').setName('button_twoPlayer').setInteractive();
+            c.add(tPB);
+
+            // two player button
+            y = cC.height * 0.75;
+            let mB = scene.add.image(cC.cX, y, 'ui', 'manualButton').setName('button_manual').setInteractive();
+            c.add(mB);
+
+
+            // show function
+            c.show = (_show=true)=> {
+                vars.input.enabled=false;
+                let alpha = _show ? 1 : 0;
+                scene.tweens.add({
+                    targets: c, alpha: alpha, duration: 1000,
+                    onComplete: ()=> { vars.input.enabled=true; }
+                });
+            };
         }
     }
 }

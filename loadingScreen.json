@@ -1,0 +1,61 @@
+{
+	"textures": [
+		{
+			"image": "loadingScreen",
+			"format": "RGBA8888",
+			"size": {
+				"w": 1251,
+				"h": 654
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "mastermindLogo",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1247,
+						"h": 494
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1247,
+						"h": 494
+					},
+					"frame": {
+						"x": 2,
+						"y": 2,
+						"w": 1247,
+						"h": 494
+					}
+				},
+				{
+					"filename": "offer0",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 410,
+						"h": 152
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 410,
+						"h": 152
+					},
+					"frame": {
+						"x": 2,
+						"y": 500,
+						"w": 410,
+						"h": 152
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "http://free-tex-packer.com",
+		"version": "0.6.7"
+	}
+}

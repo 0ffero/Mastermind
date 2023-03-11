@@ -10,8 +10,11 @@ const consts = {
         marbleMoving:       20,
         winMessage:         25,
         warningContainer:   30,
+        singlePlayerPopup:  30,
         winContainer:       35,
-        loadingScreen:      50
+        loadingScreen:      100,
+        selectionScreen:    105,
+        manual:             110
     },
 
     mouse: {
