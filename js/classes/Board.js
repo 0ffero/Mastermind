@@ -261,7 +261,7 @@ let Board = class {
             if (g===null) continue;
             
             let selIndex = solutionCopy.findIndex(m=>m===g);
-            selIndex>-1 && outOfPlace++; // found the guess in the solution
+            selIndex>-1 && (outOfPlace++,solutionCopy[selIndex]=null); // found the guess in the solution
         };
         
         vars.DEBUG && console.log(`outOfPlace: ${outOfPlace}`, `\nSolution COPY`,solutionCopy);
