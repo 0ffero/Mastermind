@@ -1,7 +1,7 @@
 var vars = {
     DEBUG: false,
 
-    version: 0.974,
+    version: 0.975,
 
     getScene: ()=> {
         return vars.Phaser.scene;

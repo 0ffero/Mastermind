@@ -463,6 +463,7 @@ let Board = class {
     setWins() {
         this.scores.forEach((_s,_i)=> {
             this.players[_i+1].wins = _s;
+            this.players[_i+1].updateWinsText();
         });
         delete(this.scores);
     }
@@ -538,5 +539,8 @@ let Board = class {
         // now make the winning players win image visible
         this.winScreenImages[p].setVisible(true);
 
+        if (_pID===1 || _pID===2) {
+            this.players[_pID].incrementWins();
+        };
     }
 };

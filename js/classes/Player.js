@@ -321,6 +321,6 @@ let Player = class {
     }
 
     updateWinsText() {
-
+        this.winCountText.setText(`WINS: ${this.wins}`);
     }
 };
