@@ -187,6 +187,10 @@ let Board = class {
 
     checkGuess() {
         vars.DEBUG && console.log(`%cChecking Guess`, 'font-weight: bold; color: green');
+
+        // hide the buttons
+        this.showButtons(false, 'ALL');
+
         let board = vars.App.Board;
 
         let pClass = vars.App.getCurrentPlayer();
@@ -347,9 +351,6 @@ let Board = class {
 
         // show the next setter
         _pClass.showNextSet();
-
-        // hide the buttons
-        this.showButtons(false, 'ALL');
     }
 
     generateRandomSolution() {
@@ -418,9 +419,24 @@ let Board = class {
         c.x = setter.getTopLeft().x+5;
     }
 
+    nextPlayer() {
+        if (this.singlePlayer) return;
+
+        this.currentPlayer = this.currentPlayer===1 ? 2: 1;
+
+        vars.DEBUG && console.log(`Player ${this.currentPlayer} shot`);
+    }
+
+    nextState() {
+        this.states.push(this.state);
+        this.state = this.states.shift();
+
+        vars.DEBUG && console.log(`State updated to ${this.state}`);
+    }
+
     restart() {
-        // empty out the single player solution
-        this.singlePlayer && this.containers.solution.empty();
+        // empty out the single player solution if it exists
+        (this.singlePlayer && this.containers.solution && this.containers.solution.empty) && this.containers.solution.empty();
         // hide the newGame button
         this.newGameButton.setAlpha(0);
 
@@ -436,21 +452,6 @@ let Board = class {
                 vars.App.start();
             }
         });
-    }
-
-    nextPlayer() {
-        if (this.singlePlayer) return;
-
-        this.currentPlayer = this.currentPlayer===1 ? 2: 1;
-
-        vars.DEBUG && console.log(`Player ${this.currentPlayer} shot`);
-    }
-
-    nextState() {
-        this.states.push(this.state);
-        this.state = this.states.shift();
-
-        vars.DEBUG && console.log(`State updated to ${this.state}`);
     }
 
     setWinRequired() {
