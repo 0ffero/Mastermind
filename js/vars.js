@@ -1,7 +1,7 @@
 var vars = {
     DEBUG: true,
 
-    version: 0.962,
+    version: 0.97,
 
     getScene: ()=> {
         return vars.Phaser.scene;
@@ -137,9 +137,7 @@ var vars = {
 
             vars.UI.destroyBouncingBalls();
 
-            scene.tweens.add({
-                targets: [sS,lS], alpha: 0, duration: 750
-            });
+            scene.tweens.add({ targets: [sS,lS], alpha: 0, duration: 750 });
         },
 
         start: ()=> {
@@ -318,7 +316,10 @@ var vars = {
             let depth = consts.depths.loadingScreen;
 
             let lS = vars.loadingScreen = scene.add.container().setAlpha(0).setDepth(depth);
-            
+
+            let bg = scene.add.image(cC.cX, cC.cY, 'loadingScreenPixel').setScale(cC.width, cC.height);
+            lS.add(bg);
+
             let lsImage = scene.add.image(cC.width*0.025,cC.height*0.05,'loadingScreen','mastermindLogo').setOrigin(0).setName('lsImage');
             lS.add(lsImage);
 

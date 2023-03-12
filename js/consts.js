@@ -12,6 +12,7 @@ const consts = {
         warningContainer:   30,
         singlePlayerPopup:  30,
         winContainer:       35,
+        singlePlayerSetter: 40,
         loadingScreen:      100,
         selectionScreen:    105,
         manual:             110
@@ -21,6 +22,8 @@ const consts = {
         { xMin: 110, xMax: 110+520, yMin: 480, yMax: 480+500 },
         { xMin: 1290, xMax: 1290+520, yMin: 90, yMax: 90+720 }
     ],
+
+    marbleColours: ['White','Yellow','Orange','Red','Blue','Green'],
 
     mouse: {
         buttons: {

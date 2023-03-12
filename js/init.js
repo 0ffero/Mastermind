@@ -8,7 +8,7 @@ var config = {
     fps: { target: 60 },
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH, width: consts.canvas.width, height: consts.canvas.height },
     scene: { preload: preload, create: create, update: update,
-        pack: { files: [ { type: 'atlas', key: 'loadingScreen', url: 'loadingScreen.png'} ] }
+        pack: { files: [ { type: 'atlas', key: 'loadingScreen', url: 'loadingScreen.png'}, { type: 'image', key: 'loadingScreenPixel', url: 'backgroundColour.png'} ] }
     }
 };
 
@@ -25,9 +25,8 @@ var game = vars.Phaser.game = new Phaser.Game(config);
 function preload() {
     vars.Phaser.scene = this;
     vars.UI.initLoadingScreen();
-
     vars.init();
-}
+};
 
 
 

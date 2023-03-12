@@ -5,7 +5,7 @@
 			"format": "RGBA8888",
 			"size": {
 				"w": 2638,
-				"h": 2007
+				"h": 2114
 			},
 			"scale": 1,
 			"frames": [
@@ -73,7 +73,7 @@
 					}
 				},
 				{
-					"filename": "p1win",
+					"filename": "p2win",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -94,7 +94,7 @@
 					}
 				},
 				{
-					"filename": "p2win",
+					"filename": "p1win",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -136,6 +136,27 @@
 					}
 				},
 				{
+					"filename": "singlePlayerLose",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 701,
+						"h": 261
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 701,
+						"h": 261
+					},
+					"frame": {
+						"x": 2,
+						"y": 1682,
+						"w": 701,
+						"h": 261
+					}
+				},
+				{
 					"filename": "solution",
 					"rotated": false,
 					"trimmed": false,
@@ -150,7 +171,7 @@
 						"h": 323
 					},
 					"frame": {
-						"x": 2,
+						"x": 707,
 						"y": 1682,
 						"w": 518,
 						"h": 323
@@ -213,8 +234,8 @@
 						"h": 103
 					},
 					"frame": {
-						"x": 524,
-						"y": 1682,
+						"x": 2,
+						"y": 1947,
 						"w": 445,
 						"h": 103
 					}
@@ -234,8 +255,8 @@
 						"h": 103
 					},
 					"frame": {
-						"x": 973,
-						"y": 1682,
+						"x": 1229,
+						"y": 1974,
 						"w": 445,
 						"h": 103
 					}
@@ -255,8 +276,8 @@
 						"h": 103
 					},
 					"frame": {
-						"x": 2272,
-						"y": 1647,
+						"x": 451,
+						"y": 2009,
 						"w": 260,
 						"h": 103
 					}
@@ -276,8 +297,8 @@
 						"h": 103
 					},
 					"frame": {
-						"x": 2272,
-						"y": 1754,
+						"x": 715,
+						"y": 2009,
 						"w": 260,
 						"h": 103
 					}

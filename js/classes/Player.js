@@ -69,7 +69,7 @@ let Player = class {
 
     initMarbles(scene) {
         let leftOffset=60; let xDelta=80;
-        let mC = this.marbleColours = ['White','Yellow','Orange','Red','Blue','Green'];
+        let mC = this.marbleColours = consts.marbleColours;
         let xy = this.chooser.getLeftCenter();
 
         let x = xy.x+leftOffset;

@@ -19,7 +19,7 @@ let Board = class {
         // win: one of the players have won
         this.states = ['playing','win'];
 
-        this.containers = {};
+        this.containers = { buttons: null, singlePlayerPopup: null, solution: null, warning: null, win: null };
 
         let cC = this.cC;
         let scene = this.scene;
@@ -39,6 +39,7 @@ let Board = class {
         this.initWarningScreen(scene, cC);
 
         if (this.singlePlayer) {
+            this.containers.solution = scene.add.container().setDepth(consts.depths.singlePlayerSetter);
             this.initSinglePlayerPopup(scene,cC);
             let delay = this.singlePlayerHideBoard2();
             scene.tweens.addCounter({
@@ -150,9 +151,10 @@ let Board = class {
         let bg = scene.add.image(cC.cX, cC.height*0.4, 'ui', 'winBG');
         wC.add(bg);
         this.winScreenImages = [];
-        [1,2,3].forEach((_pwin)=> {
-            let frame = _pwin===3 ? 'draw' : `p${_pwin}win`;
-            let pwin = scene.add.image(cC.cX, cC.height*0.4, 'ui', frame).setVisible(false);
+        [1,2,3,4].forEach((_pwin)=> {
+            let frame = _pwin===3 ? 'draw' : _pwin===4 ? 'singlePlayerLose' : `p${_pwin}win`;
+            let y = _pwin===4 ? cC.height*0.3 : cC.height*0.4;
+            let pwin = scene.add.image(cC.cX, y, 'ui', frame).setVisible(false);
             this.winScreenImages.push(pwin);
             wC.add(pwin);
         });
@@ -184,12 +186,12 @@ let Board = class {
     }
 
     checkGuess() {
-        console.log(`%cChecking Guess`, 'font-weight: bold; color: green');
+        vars.DEBUG && console.log(`%cChecking Guess`, 'font-weight: bold; color: green');
         let board = vars.App.Board;
 
-        let p = vars.App.getCurrentPlayer();
-        let pID = p.id;
-        let guess = p.guessArray[p.positionVisible];
+        let pClass = vars.App.getCurrentPlayer();
+        let pID = pClass.id;
+        let guess = pClass.guessArray[pClass.positionVisible];
 
         let solution = board.solutions[pID];
 
@@ -213,11 +215,11 @@ let Board = class {
         vars.DEBUG && console.log(`inPlace: ${inPlace}`,`\nGuess`,guess, `\nSolution COPY`,solutionCopy);
         
         if (inPlace===4) { // this player has found a solution
-            p.winMessage.show(); // show the win message
+            pClass.winMessage.show(); // show the win message
             if (pID===1) { // if this is player one, player two still has a shot, but they must crack the combination on their next attempt
                 if (!this.singlePlayer) {
                     this.setWinRequired();
-                    console.log(`PLAYER 1 FOUND THEIR SOLUTION\n    Player 2 MUST find the solution this attempt!`);
+                    vars.DEBUG && console.log(`PLAYER 1 FOUND THEIR SOLUTION\n    Player 2 MUST find the solution this attempt!`);
                     this.nextPlayer();
                     return;
                 };
@@ -231,7 +233,7 @@ let Board = class {
             // player 2 has found the combination!
             let winImage;
             if (this.winRequired) { // draw! both player 1 and 2 completed on the same move
-                console.log(`GAME HAS ENDED IN A DRAW!`);
+                vars.DEBUG && console.log(`GAME HAS ENDED IN A DRAW!`);
                 winImage = 3;
             } else { // player 2 wins!
                 winImage = 2;
@@ -248,23 +250,23 @@ let Board = class {
             return;
         };
         
-        // check for in solution but in the wrong position
+        // check for "in solution but in the wrong position"
         let outOfPlace=0;
         while (guess.length) {
             let g = guess.shift();
             if (g===null) continue;
             
             let selIndex = solutionCopy.findIndex(m=>m===g);
-            if (selIndex>-1) { // found the guess in the solution
-                //solutionCopy.splice(selIndex,1);
-                outOfPlace++;
-            };
-            
+            selIndex>-1 && outOfPlace++; // found the guess in the solution
         };
         
         vars.DEBUG && console.log(`outOfPlace: ${outOfPlace}`, `\nSolution COPY`,solutionCopy);
         let sol = { inPlace: inPlace, outOfPlace: outOfPlace };
-        this.generatePegs(p, sol);
+        this.generatePegs(pClass, sol);
+
+        if ((pClass.positionVisible===10 && this.singlePlayer) || (pClass.positionVisible===10 && pClass.id===2)) {
+            this.lose();
+        };
         
         // after checking the guess, get the next player
         this.nextPlayer();
@@ -364,6 +366,29 @@ let Board = class {
         this.solutions[1] = sol;
     }
 
+    generateSolution() {
+        let colours = consts.marbleColours;
+        let scene = this.scene;
+        let cC = this.cC;
+        // add "setter"
+        let c = this.containers.solution;
+        let setter = scene.add.image(cC.width*0.25, cC.height*0.55, 'boardAndPieces', 'setter');
+        c.add(setter);
+        let lC = setter.getLeftCenter();
+
+        let left = 65;
+        let xDelta = 80;
+        let y = lC.y+5;
+        this.solutions[1].forEach((_int,_i)=> {
+            let frame = `marble${colours[_int]}`;
+            let x = _i*xDelta + lC.x + left;
+            let marble = scene.add.image(x, y, 'boardAndPieces', frame);
+            c.add(marble);
+        });
+
+        c.empty = ()=> { c.removeAll(true); };
+    }
+
     hideWinScreen() {
         let duration = 1000;
         let wS = this.containers.win;
@@ -372,6 +397,15 @@ let Board = class {
         });
 
         return duration;
+    }
+
+    lose() {
+        let wS = 3; // default - draw (2 player)
+        if (this.singlePlayer) { wS = 4; this.generateSolution(); }; // single player loss, generate solution
+        this.updateWinScreen(wS);
+
+        // show the win/lose screen
+        this.showWinScreen();
     }
 
     moveButtonContainer() {
@@ -385,6 +419,8 @@ let Board = class {
     }
 
     restart() {
+        // empty out the single player solution
+        this.singlePlayer && this.containers.solution.empty();
         // hide the newGame button
         this.newGameButton.setAlpha(0);
 
