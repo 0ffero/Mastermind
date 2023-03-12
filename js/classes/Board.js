@@ -51,6 +51,7 @@ let Board = class {
             });
         } else {
             this.initPlayers();
+            this.initSetCodeText(scene,cC);
         };
 
     }
@@ -80,6 +81,30 @@ let Board = class {
 
         this.winRequired = false;
         this.currentPlayer = 1;
+    }
+
+    initSetCodeText(scene,cC) {
+        let text = `Player 1.\nSet the code for your opponent.`;
+        let font = vars.fonts.large;
+        let sCT = this.setCodeText = scene.add.text(cC.width*0.25, cC.height*0.35, text, font).setOrigin(0.5).setAlpha(0);
+
+        sCT.show = (_show=true)=> {
+            let alpha = _show ? 1 : 0;
+            scene.tweens.add({ targets: sCT, alpha: alpha, duration: 500,
+                onComplete: ()=> {
+                    if (alpha) return;
+                    sCT.setPosition(cC.width*0.25, sCT.y);
+                    let rText = text;
+                    sCT.setText(rText);
+                } 
+            });
+        };
+
+        sCT.moveToP2Position =()=> {
+            let rText = text.replace('1','2');
+            sCT.setText(rText);
+            scene.tweens.add({ targets: sCT, x: cC.width*0.75, duration: 500, ease: 'Quad.easeInOut' })
+        };
     }
 
     initSinglePlayerPopup(scene, cC) {
@@ -181,6 +206,8 @@ let Board = class {
             this.solutions = { 1: this.solutions[2], 2: this.solutions[1] }; // swap the solutions around
             this.nextState(); // update the state to playing
         };
+
+        this.state==='playing' ? this.setCodeText.show(false) : this.setCodeText.moveToP2Position();
 
         return sol.length-1;
     }

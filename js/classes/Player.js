@@ -107,6 +107,7 @@ let Player = class {
             targets: setter, alpha: 1, duration: 500, delay: this.startDelay*1.5, y: endY, ease: 'Quad.easeOut',
             onStart: ()=> {
                 pID===1 && vars.audio.playSound('woodSlide');
+                vars.App.Board.setCodeText.show();
             },
             onComplete: ()=> {
                 if (pID===1) return;
