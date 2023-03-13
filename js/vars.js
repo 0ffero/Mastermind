@@ -1,7 +1,7 @@
 var vars = {
     DEBUG: true,
 
-    version: 0.976,
+    version: 0.98,
 
     getScene: ()=> {
         return vars.Phaser.scene;
@@ -73,6 +73,12 @@ var vars = {
             }
         },
 
+        shaders: {
+            load: (scene)=> {
+                scene.load.glsl('heavenlyCircles', `shaders/heavenlyCircles.frag`);
+            }
+        },
+
         loadAssets: ()=> {
             let scene = vars.getScene();
             scene.load.setPath('assets');
@@ -81,6 +87,7 @@ var vars = {
 			fV.audio.load(scene);
             fV.images.init(scene);
             fV.plugins.load(scene);
+            fV.shaders.load(scene);
         }
     },
 
@@ -110,6 +117,7 @@ var vars = {
         init: ()=> {
             vars.camera.init();
             // generate the UI
+            vars.shaders.init();
             vars.UI.init();
         },
 
@@ -136,6 +144,7 @@ var vars = {
             vars.input.enabled = false;
 
             vars.UI.destroyBouncingBalls();
+            vars.shaders.destroy();
 
             scene.tweens.add({ targets: [sS,lS], alpha: 0, duration: 750 });
         },
@@ -298,6 +307,41 @@ var vars = {
         scene: null
     },
 
+    shaders: {
+        bgShader: null,
+        shaderImage: null,
+
+        init: ()=> {
+            let scene = vars.getScene();
+            let cC = consts.canvas;
+            let sV = vars.shaders;
+
+            let sC = consts.shader;
+
+            let shaderName = 'heavenlyCircles';
+            let bgShader = sV.bgShader = scene.add.shader(shaderName, cC.cX, cC.cY, sC.width,sC.height);
+            bgShader.setRenderToTexture(shaderName);
+            
+        },
+
+        destroy: ()=> {
+            let sV = vars.shaders;
+            sV.shaderImage.tween && (sV.shaderImage.tween.remove(), delete(sV.shaderImage.tween));
+            sV.shaderImage.destroy();
+            sV.shaderImage=null;
+        },
+        
+        generate: ()=> {
+            let scene = vars.getScene();
+            let cC = consts.canvas;
+            let sV = vars.shaders;
+
+            let scale = cC.width/consts.shader.width;
+            sV.shaderImage = scene.add.image(cC.cX, cC.cY, 'heavenlyCircles').setScale(scale).setDepth(consts.depths.loadingScreen+1).setBlendMode(3).setAlpha(0);
+            sV.shaderImage.tween = scene.tweens.add({ targets: sV.shaderImage, alpha: 1, duration: 5000, onComplete: ()=> { delete(sV.shaderImage.tween); }})
+        }
+    },
+
     UI: {
         containers: { bouncingBalls: null, manual: null, selectionScreen: null },
         marbleColours: ['White','Yellow','Orange','Red','Blue','Green'],
@@ -308,6 +352,11 @@ var vars = {
             let cC = consts.canvas;
             UI.generateSelectionScreen(scene, cC);
             UI.generateManual(scene, cC);
+            UI.initBackgroundShader();
+        },
+        
+        initBackgroundShader: ()=> {
+            vars.shaders.generate();
         },
 
         initLoadingScreen: ()=> {
@@ -383,11 +432,10 @@ var vars = {
 
 
             // show function
-            c.show = (_show=true)=> {
+            c.show = ()=> {
                 vars.input.enabled=false;
-                let alpha = _show ? 1 : 0;
                 scene.tweens.add({
-                    targets: c, alpha: alpha, duration: 1000,
+                    targets: c, alpha: 1, duration: 750, ease: 'Quad.easeIn',
                     onComplete: ()=> { vars.input.enabled=true; vars.UI.startBouncingBalls(); }
                 });
             };

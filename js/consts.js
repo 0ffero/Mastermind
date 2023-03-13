@@ -40,5 +40,7 @@ const consts = {
             3           : 'THUMB_1',
             4           : 'THUMB_2'
         }
-    }
+    },
+
+    shader: { width: 640, height: 360 }
 };
